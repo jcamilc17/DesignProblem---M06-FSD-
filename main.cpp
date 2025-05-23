@@ -61,15 +61,14 @@ unsigned long delaytime = 1000;
 
 /* Global Variables */
 int i = 0;
-
-/* Row Number */
-int rowNum = 0;
+int carsRowsPassed = 0;
+int passLevel = 0;
 
 /* States ans signals to change state*/
-enum State_enum {STATERESET, STATESTART, STATECLEAR, STATECHECK, STATELEFT, STATERIGTH, STATELOST,LEVELTWO, LEVELTHREE, STATEWIN};
+enum State_enum {STATERESET, STATESTART, STATECLEAR, STATECHECK, STATELEFT, STATERIGTH, STATELOST,LEVELONE,LEVELTWO, LEVELTHREE, STATEWIN};
 uint8_t state = STATERESET;
 
-enum Keys_enum {RESET_KEY, START_KEY, LEFT_KEY, RIGHT_KEY, NO_KEY};
+enum Keys_enum {RESET_KEY, START_KEY, LEFT_KEY, RIGHT_KEY, NO_KEY, CONTINUE_KEY};
 uint8_t keys = RESET_KEY;
 
 enum Status_enum {LOST, CONTINUE};
@@ -195,6 +194,70 @@ void writeLostMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
   pointerRegCar[0] = B00000000;
 }
 //=======================================================
+//  FUNCTION: Level One Matrix
+//=======================================================
+void writeLevelOneMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
+{
+  pointerRegMatrix[7] = B00011100;
+  pointerRegMatrix[6] = B00011100;
+  pointerRegMatrix[5] = B01101100;
+  pointerRegMatrix[4] = B11001100;
+  pointerRegMatrix[3] = B00001100;
+  pointerRegMatrix[2] = B00001100;
+  pointerRegMatrix[1] = B00001100;
+  pointerRegMatrix[0] = B11111111;
+
+  pointerRegCar[0] = B00000000;
+}
+//=======================================================
+//  FUNCTION: Level Two Matrix
+//=======================================================
+void writeLevelTwoMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
+{
+  pointerRegMatrix[7] = B01111110;
+  pointerRegMatrix[6] = B10000001;
+  pointerRegMatrix[5] = B00000001;
+  pointerRegMatrix[4] = B00000110;
+  pointerRegMatrix[3] = B00011000;
+  pointerRegMatrix[2] = B01100000;
+  pointerRegMatrix[1] = B10000000;
+  pointerRegMatrix[0] = B11111111;
+
+  pointerRegCar[0] = B00000000;
+}
+//=======================================================
+//  FUNCTION: Level Three Matrix
+//=======================================================
+void writeLevelThreeMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
+{
+  pointerRegMatrix[7] = B01111110;
+  pointerRegMatrix[6] = B10000001;
+  pointerRegMatrix[5] = B00000001;
+  pointerRegMatrix[4] = B00011110;
+  pointerRegMatrix[3] = B00000001;
+  pointerRegMatrix[2] = B00000001;
+  pointerRegMatrix[1] = B10000001;
+  pointerRegMatrix[0] = B01111110;
+
+  pointerRegCar[0] = B00000000;
+}
+//=======================================================
+//  FUNCTION: Win Matrix
+//=======================================================
+void writeWinMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
+{
+  pointerRegMatrix[7] = B01010100;
+  pointerRegMatrix[6] = B10101010;
+  pointerRegMatrix[5] = B01010100;
+  pointerRegMatrix[4] = B00111000;
+  pointerRegMatrix[3] = B11111111;
+  pointerRegMatrix[2] = B10000001;
+  pointerRegMatrix[1] = B10000001;
+  pointerRegMatrix[0] = B01111110;
+
+  pointerRegCar[0] = B00000000;
+}
+//=======================================================
 //  FUNCTION: writeGoCarsMatrix
 //=======================================================
 void writeGoCarsMatrix(byte *pointerRegMatrix)
@@ -254,14 +317,14 @@ void checkLostMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
 
   if (pointerRegCar[0] == pointerRegMatrix[0])
     Status = LOST;
-    rowNum = 0;
+    carsRowsPassed = 0;
   else if (check1 != check2)
     Status = LOST;
-    rowNum = 0;
+    carsRowsPassed = 0;
   else
     Status = CONTINUE;
-    rowNum ++;
-    Serial.print(rownNum);
+    carsRowsPassed ++;
+    Serial.print(carsRowsPassed);
 }
 //=======================================================
 //  FUNCTION: printBits (by console all bits)
@@ -340,6 +403,9 @@ byte read_KEY(void)
     case 'A':
       keys = LEFT_KEY;
       break;
+    case 'N':
+      keys = CONTINUE_KEY;
+      break;
     case 'D':
       keys = RIGHT_KEY;
       break;
@@ -349,54 +415,7 @@ byte read_KEY(void)
   }
 return keys;
 }
-//=======================================================
-//  FUNCTION: Level Two Matrix
-//=======================================================
-void writeLevelTwoMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
-{
-  pointerRegMatrix[7] = B01111110;
-  pointerRegMatrix[6] = B10000001;
-  pointerRegMatrix[5] = B00000001;
-  pointerRegMatrix[4] = B00000110;
-  pointerRegMatrix[3] = B00011000;
-  pointerRegMatrix[2] = B01100000;
-  pointerRegMatrix[1] = B10000000;
-  pointerRegMatrix[0] = B11111111;
 
-  pointerRegCar[0] = B00000000;
-}
-//=======================================================
-//  FUNCTION: Level Three Matrix
-//=======================================================
-void writeLevelThreeMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
-{
-  pointerRegMatrix[7] = B01111110;
-  pointerRegMatrix[6] = B10000001;
-  pointerRegMatrix[5] = B00000001;
-  pointerRegMatrix[4] = B00011110;
-  pointerRegMatrix[3] = B00000001;
-  pointerRegMatrix[2] = B00000001;
-  pointerRegMatrix[1] = B10000001;
-  pointerRegMatrix[0] = B01111110;
-
-  pointerRegCar[0] = B00000000;
-}
-//=======================================================
-//  FUNCTION: Win Matrix
-//=======================================================
-void writeWinMatrix(byte *pointerRegMatrix, byte *pointerRegCar)
-{
-  pointerRegMatrix[7] = B01010100;
-  pointerRegMatrix[6] = B10101010;
-  pointerRegMatrix[5] = B01010100;
-  pointerRegMatrix[4] = B00111000;
-  pointerRegMatrix[3] = B11111111;
-  pointerRegMatrix[2] = B10000001;
-  pointerRegMatrix[1] = B10000001;
-  pointerRegMatrix[0] = B01111110;
-
-  pointerRegCar[0] = B00000000;
-}
 //=======================================================
 //  FUNCTION: state_machine_run
 //=======================================================
@@ -418,7 +437,6 @@ void state_machine_run(byte *pointerRegMatrix, byte *pointerRegCar, byte *pointe
         else if (keys == START_KEY)
           state = STATESTART;
       }
-      
       break;
 
     case STATESTART:
@@ -433,7 +451,11 @@ void state_machine_run(byte *pointerRegMatrix, byte *pointerRegCar, byte *pointe
       writeClearMatrix(pointerRegMatrix,pointerRegCar);
       if  (currentMillis - previousMillis >= delaytime){
         previousMillis = currentMillis;
-        state = STATECHECK;
+        if (passLevel == 0){
+          state = LEVELONE;
+        }
+        else
+          state = STATECHECK;
       }
       break;
 
@@ -444,11 +466,14 @@ void state_machine_run(byte *pointerRegMatrix, byte *pointerRegCar, byte *pointe
       if  (currentMillis - previousMillis >= delaytime){
         previousMillis = currentMillis;
         checkLostMatrix(pointerRegMatrix, pointerRegCar);
-        if (rowNum >= 10 )
+        if (carsRowsPassed >= 10 )
+          passLevel ++;
           state = LEVELTWO;
-        else if (rowNum >= 25)
+        else if (carsRowsPassed >= 25)
+          passLevel ++;
           state = LEVELTHREE;
-        else if (rowNum >= 45)
+        else if (carsRowsPassed >= 45)
+          passLevel = 0;
           state = STATEWIN;
         else if (Status == LOST)
           state = STATELOST;
@@ -463,21 +488,39 @@ void state_machine_run(byte *pointerRegMatrix, byte *pointerRegCar, byte *pointe
       }
       break;
 
+    case LEVELONE:
+      writeLevelOneMatrix(pointerRegMatrix, pointerRegCar);
+      delaytime = 1000;
+      if  (keys == CONTINUE_KEY)
+        state = STATECHECK;
+      if (keys == RESET_KEY)
+        state =  STATERESET;
+      break;
+
     case LEVELTWO:
-      writeTwoMatrix();
+      writeLevelTwoMatrix(pointerRegMatrix, pointerRegCar);
       delaytime = 666;
-      state = STATECHECK;
+      if  (keys == CONTINUE_KEY)
+        state = STATECHECK;
+      if (keys == RESET_KEY)
+        state =  STATERESET;
       break;
 
     case LEVELTHREE:
-      writeThreeMatrix();
+      writeLevelThreeMatrix(pointerRegMatrix, pointerRegCar);
       delaytime = 333;
-      state = STATECHECK;
+      if  (keys == CONTINUE_KEY)
+        state = STATECHECK;
+      if (keys == RESET_KEY)
+        state =  STATERESET;
       break;
-      
+
     case STATEWIN:
-      writeWinMatrix();
-      state = STATESTART;
+      writeWinMatrix(pointerRegMatrix, pointerRegCar);
+      if (keys == RESET_KEY)
+        state = STATERESET ;
+      else if (keys == START_KEY)
+        state = STATESTART;
       break;
 
     case STATELEFT:
