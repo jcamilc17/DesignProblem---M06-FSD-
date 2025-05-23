@@ -467,16 +467,18 @@ void state_machine_run(byte *pointerRegMatrix, byte *pointerRegCar, byte *pointe
       writeTwoMatrix();
       delaytime = 666;
       state = STATECHECK;
-      
+      break;
+
     case LEVELTHREE:
       writeThreeMatrix();
       delaytime = 333;
       state = STATECHECK;
-
+      break;
+      
     case STATEWIN:
       writeWinMatrix();
       state = STATESTART;
-
+      break;
 
     case STATELEFT:
       pointerShiftDir[0] = B00000001;
